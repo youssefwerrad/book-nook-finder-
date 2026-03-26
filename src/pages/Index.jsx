@@ -4,7 +4,7 @@ import SearchBar from "@/components/SearchBar";
 import BookGrid from "@/components/BookGrid";
 import BookCard from "@/components/BookCard";
 import BookModal from "@/components/BookModal";
-import { useBookSearch, useTrending, fetchBooks } from "@/hooks/useBookSearch";
+import { useTrending, fetchBooks } from "@/hooks/useBookSearch";
 
 export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,8 +27,8 @@ export default function Index() {
     setHasSearched(true);
     setPage(1);
     setAllBooks([]);
-    setIsLoading(true);   // add this
-    setIsError(false);    // add this
+    setIsLoading(true);
+    setIsError(false);
 
     try {
       const data = await fetchBooks(query, type, 1);
@@ -36,9 +36,9 @@ export default function Index() {
       setTotalFound(data.total ?? 0);
       setTotalPages(data.totalPages ?? 0);
     } catch {
-      setIsError(true);   // add this
+      setIsError(true);
     } finally {
-      setIsLoading(false); // add this
+      setIsLoading(false); 
     }
   },
   []
