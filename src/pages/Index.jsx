@@ -6,6 +6,8 @@ import BookCard from "@/components/BookCard";
 import BookModal from "@/components/BookModal";
 import { useTrending, fetchBooks } from "@/hooks/useBookSearch";
 
+const GENRES = ["Fiction", "Mystery", "Fantasy", "Science", "History", "Romance", "Biography", "Thriller"];
+
 export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("title");
@@ -16,9 +18,9 @@ export default function Index() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalFound, setTotalFound] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+
   const { data: trending } = useTrending();
 
   const handleSearch = useCallback(async (query, type) => {
@@ -29,7 +31,6 @@ export default function Index() {
     setAllBooks([]);
     setIsLoading(true);
     setIsError(false);
-
     try {
       const data = await fetchBooks(query, type, 1);
       setAllBooks(data.books ?? []);
@@ -38,11 +39,24 @@ export default function Index() {
     } catch {
       setIsError(true);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
-  },
-  []
-);
+  }, []);
+
+  const handleClear = useCallback(() => {
+    setHasSearched(false);
+    setAllBooks([]);
+    setTotalFound(0);
+    setTotalPages(0);
+    setPage(1);
+    setSearchQuery("");
+    setIsError(false);
+  }, []);
+
+  const handleGenre = useCallback(
+    (genre) => handleSearch(genre, "subject"),
+    [handleSearch]
+  );
 
   const handleLoadMore = useCallback(async () => {
     if (isLoadingMore) return;
@@ -77,7 +91,20 @@ export default function Index() {
           Explore millions of books from the Open Library. Search by title, author, or genre.
         </p>
         <div className="opacity-0 animate-fade-up" style={{ animationDelay: "200ms" }}>
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar onSearch={handleSearch} onClear={handleClear} />
+
+          {/* Genre pills */}
+          <div className="flex flex-wrap justify-center gap-2 mt-4">
+            {GENRES.map((genre) => (
+              <button
+                key={genre}
+                onClick={() => handleGenre(genre)}
+                className="px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-150"
+              >
+                {genre}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
